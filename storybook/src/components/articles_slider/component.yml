@@ -1,0 +1,118 @@
+name: Articles slider
+machineName: articles_slider
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    heading:
+      title: Heading
+      type: string
+      examples:
+        - Latest News
+    # --- Tab 2 ---
+    headingColor:
+      title: Select
+      type: string
+      enum:
+        - Dark
+        - Light
+        - Color
+      examples:
+        - Dark
+    headingAlignment:
+      title: Select
+      type: string
+      enum:
+        - Left
+        - Center
+        - Right
+      examples:
+        - Left
+    containerBackgroundColor:
+      title: Container background color
+      type: string
+      examples:
+        - '#ffffff'
+    padding:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Top and bottom
+        - Top only
+        - Bottom only
+      examples:
+        - Top and bottom
+    cardBackgroundColor:
+      title: Card background color
+      type: string
+      examples:
+        - '#ffffff'
+    cardTextColor:
+      title: Select
+      type: string
+      enum:
+        - Dark text
+        - Light text
+      examples:
+        - Dark text
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+      examples:
+        - ''
+    cardBorder:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - '#e5e7eb'
+    articles:
+      title: Articles (mock data)
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          excerpt:
+            type: string
+          image:
+            type: string
+          url:
+            type: string
+          date:
+            type: string
+      examples:
+        - - title: How to choose the right frames
+            excerpt: Finding the perfect pair of glasses is about more than just correcting your vision.
+            image: https://placehold.co/400x300/006699/ffffff?text=Article+1
+            url: /news/choosing-frames
+            date: 5 June 2026
+          - title: Our new Glasgow showroom
+            excerpt: We are thrilled to announce the opening of our newest showroom in the heart of Glasgow.
+            image: https://placehold.co/400x300/005580/ffffff?text=Article+2
+            url: /news/glasgow-showroom
+            date: 20 May 2026
+          - title: The science of lens coatings
+            excerpt: Lens coatings can make a huge difference to your everyday vision experience.
+            image: https://placehold.co/400x300/004466/ffffff?text=Article+3
+            url: /news/lens-coatings
+            date: 10 April 2026

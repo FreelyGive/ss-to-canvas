@@ -1,0 +1,56 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*storybook.log
+
+node_modules
+package-lock.json
+dist
+dist-ssr
+storybook-static
+.env
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/.playwright-cli/
+/.playwright/
+.beads
+
+# Local content storage
+/content/
+/.claude/settings.local.json
+
+/.claude/skills/playwright-cli/
+
+# Persistent browser profile used by Playwright MCP for authenticated admin work
+/.canvas-browser/
+
+# Playwright MCP runtime state (screenshots, page snapshots) — always local
+/.playwright-mcp/
+
+# Migration artifacts (generated per-project)
+/docs/migration/screenshots/
+/docs/migration/state.jsonl
+/docs/migration/state-summary.md
+/docs/migration/content/
+
+# >>> npm-scaffold (managed section, do not edit) >>>
+/.claude/skills/content-management/SKILL.md
+/src/components/utils_editor_note
+/src/components/utils_entity
+/src/components/utils_slots
+# <<< npm-scaffold <<<

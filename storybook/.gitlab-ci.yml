@@ -1,0 +1,66 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+  auto_cancel:
+    on_new_commit: interruptible
+
+stages:
+  - install
+  - test
+
+default:
+  interruptible: true
+
+variables:
+  GIT_STRATEGY: none
+
+image: node:24
+
+install:
+  stage: install
+  variables:
+    GIT_STRATEGY: fetch
+  cache:
+    key:
+      files:
+        - package-lock.json
+    fallback_keys:
+      - npm-
+    paths:
+      - .npm/
+  script:
+    - npm ci --cache .npm
+  artifacts:
+    paths:
+      - ./
+    expire_in: 1 hour
+
+lint:
+  stage: test
+  needs: [install]
+  script:
+    - npm run code:check
+
+validate:
+  stage: test
+  needs: [install]
+  script:
+    - npm run canvas:validate
+
+test:
+  stage: test
+  needs: [install]
+  cache:
+    key:
+      files:
+        - package-lock.json
+      prefix: playwright
+    fallback_keys:
+      - playwright-
+    paths:
+      - .playwright-cache/
+  variables:
+    PLAYWRIGHT_BROWSERS_PATH: $CI_PROJECT_DIR/.playwright-cache
+  script:
+    - npx playwright install --with-deps chromium
+    - npm test

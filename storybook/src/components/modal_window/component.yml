@@ -1,0 +1,43 @@
+name: Modal window
+machineName: modal_window
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    autoOpenModal:
+      title: Auto open modal
+      type: boolean
+      examples:
+        - false
+    modalWindowId:
+      title: Modal window ID
+      type: string
+      examples:
+        - my-modal
+    modalSize:
+      title: Modal size
+      type: string
+      enum:
+        - Small
+        - Medium
+        - Large
+        - Full screen
+      examples:
+        - Medium
+    modalBackgroundColor:
+      title: Modal background color
+      type: string
+      examples:
+        - '#ffffff'
+    closeButtonStyle:
+      title: Close button style
+      type: string
+      enum:
+        - Color button
+        - Light button
+        - Dark button
+      examples:
+        - Color button
+slots:
+  content:
+    title: Content

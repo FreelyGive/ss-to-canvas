@@ -1,0 +1,14 @@
+name: Utilities bar
+machineName: utilities_bar
+status: true
+props:
+  properties:
+    orientation:
+      title: Orientation
+      type: string
+      enum:
+        - Horizontal
+        - Vertical
+      examples:
+        - Horizontal
+slots: []

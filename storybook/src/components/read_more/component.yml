@@ -1,0 +1,37 @@
+name: Read more
+machineName: read_more
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    collapsedText:
+      title: Button text - collapsed
+      type: string
+      examples:
+        - Read more
+    expandedText:
+      title: Button text expanded
+      type: string
+      examples:
+        - Read less
+    buttonStyle:
+      title: Button style
+      type: string
+      enum:
+        - Read more link
+        - Read more button color
+        - Read more button dark
+        - Read more button light
+      examples:
+        - Read more link
+    spaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - Add space below
+slots:
+  content:
+    title: Content

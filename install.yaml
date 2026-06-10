@@ -1,0 +1,39 @@
+name: ss-to-storybook
+project_files:
+  - docker-compose.storybook.yaml
+  - supervisord.conf.d/storybook.conf
+  - storybook
+  - .claude/agents/ss-component-writer.md
+  - .claude/agents/ss-node-extractor.md
+  - .claude/agents/ss-field-extractor.md
+  - .claude/agents/ss-page-story-writer.md
+  - .claude/skills/component-authoring
+  - .claude/skills/site-studio-to-storybook
+  - .claude/skills/create-component
+  - .claude/skills/stories
+global_files: []
+pre_install_actions: []
+post_install_actions:
+  - |
+    #ddev-description:Move storybook from .ddev to project root
+    if [ -d "${DDEV_APPROOT}/.ddev/storybook" ]; then
+      cp -rn "${DDEV_APPROOT}/.ddev/storybook" "${DDEV_APPROOT}/"
+      rm -rf "${DDEV_APPROOT}/.ddev/storybook"
+    fi
+  - |
+    #ddev-description:Move Claude agents and skills from .ddev to project root
+    if [ -d "${DDEV_APPROOT}/.ddev/.claude" ]; then
+      mkdir -p "${DDEV_APPROOT}/.claude/agents" "${DDEV_APPROOT}/.claude/skills"
+      cp -rn "${DDEV_APPROOT}/.ddev/.claude/agents/." "${DDEV_APPROOT}/.claude/agents/"
+      cp -rn "${DDEV_APPROOT}/.ddev/.claude/skills/." "${DDEV_APPROOT}/.claude/skills/"
+      rm -rf "${DDEV_APPROOT}/.ddev/.claude"
+    fi
+  - "ddev exec -d /var/www/html/storybook npm install"
+  - "echo ''"
+  - "echo 'SS to Storybook addon installed.'"
+  - "echo 'Next steps:'"
+  - "echo '  1. ddev restart'"
+  - "echo '  2. Storybook will auto-start at https://${DDEV_HOSTNAME}:6006'"
+removal_actions:
+  - "rm -f ${DDEV_APPROOT}/.ddev/docker-compose.storybook.yaml"
+  - "rm -f ${DDEV_APPROOT}/.ddev/supervisord.conf.d/storybook.conf"

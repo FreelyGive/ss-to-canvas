@@ -1,0 +1,42 @@
+name: Breadcrumbs
+machineName: breadcrumb
+status: true
+props:
+  properties:
+    # --- Tab 1: Content ---
+    displayStyle:
+      title: Select
+      type: string
+      enum:
+        - Show breadcrumbs on transparent background
+        - Show breadcrumbs on semi-transparent dark background
+        - Show breadcrumbs on solid dark background
+        - Show breadcrumbs on solid light background
+      examples:
+        - Show breadcrumbs on semi-transparent dark background
+    position:
+      title: Select
+      type: string
+      enum:
+        - Relative to where placed
+        - Absolute position top left
+      examples:
+        - Absolute position top left
+    breadcrumbs:
+      title: Breadcrumbs
+      type: array
+      items:
+        type: object
+        properties:
+          label:
+            type: string
+          url:
+            type: string
+      examples:
+        - - label: Home
+            url: /
+          - label: Glasses
+            url: /collections/glasses
+          - label: Sunglasses
+            url: /collections/sunglasses
+slots: []

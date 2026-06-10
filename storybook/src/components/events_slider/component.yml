@@ -1,0 +1,112 @@
+name: Events slider
+machineName: events_slider
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    heading:
+      title: Heading
+      type: string
+      examples:
+        - Upcoming Events
+    eventSource:
+      title: Select
+      type: string
+      enum:
+        - Upcoming events
+        - Past events
+      examples:
+        - Upcoming events
+    # --- Tab 2 ---
+    headingColor:
+      title: Select
+      type: string
+      enum:
+        - Dark
+        - Light
+        - Color
+      examples:
+        - Dark
+    headingAlign:
+      title: Select
+      type: string
+      enum:
+        - Left
+        - Center
+        - Right
+      examples:
+        - Left
+    containerBackgroundColor:
+      title: Container background color
+      type: string
+      examples:
+        - '#ffffff'
+    padding:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Top and bottom
+        - Top only
+        - Bottom only
+      examples:
+        - Top and bottom
+    cardBackgroundColor:
+      title: Card background color
+      type: string
+      examples:
+        - '#ffffff'
+    cardTextColor:
+      title: Select
+      type: string
+      enum:
+        - Dark text
+        - Light text
+      examples:
+        - Dark text
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+    border:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - '#e5e7eb'
+    events:
+      title: Events (mock data)
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          date:
+            type: string
+          image:
+            type: object
+            $ref: json-schema-definitions://canvas.module/image
+          url:
+            type: string
+      examples:
+        - - title: Eye Health Awareness Day
+            date: 15 July 2026
+            image:
+              src: https://placehold.co/400x300/006699/ffffff?text=Event+1
+              alt: Eye Health Awareness Day
+              width: 400
+              height: 300
+            url: /events/eye-health-day

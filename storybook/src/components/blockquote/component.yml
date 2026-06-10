@@ -1,0 +1,92 @@
+name: Blockquote
+machineName: blockquote
+status: true
+props:
+  properties:
+    # --- Tab 1: Content ---
+    quote:
+      title: Quote
+      type: string
+      examples:
+        - The quality of the frames and the attention to detail is second to none.
+    name:
+      title: Name
+      type: string
+      examples:
+        - Jane Smith
+    occupationOrganization:
+      title: Occupation / Organization
+      type: string
+      examples:
+        - Director, Example Co.
+    sourceUrl:
+      title: Source URL
+      type: string
+      examples:
+        - https://example.com/review
+    showSource:
+      title: Show source
+      type: boolean
+      examples:
+        - false
+    nameOfSource:
+      title: Name of source
+      type: string
+      examples:
+        - Trustpilot
+    # --- Tab 2: Layout & Style ---
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - '#f5f2eb'
+    textColor:
+      title: Select
+      type: string
+      enum:
+        - Dark text
+        - Light text
+      examples:
+        - Dark text
+    leftBorderColor:
+      title: Left border color
+      type: string
+      examples:
+        - '#006699'
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+      examples:
+        - ''
+    conditionallyApplyPaddingIfBackgroundColorIsSet:
+      title: Conditionally apply padding if background color is set
+      type: string
+      examples:
+        - ''
+    heightBehavior:
+      title: Select
+      type: string
+      enum:
+        - Fit to content
+        - Fill space available
+      examples:
+        - Fit to content
+    addSpaceBelow:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - None
+slots: []

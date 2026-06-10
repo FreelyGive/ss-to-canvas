@@ -1,0 +1,115 @@
+name: Stat card
+machineName: stat_card
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    image:
+      title: Image
+      type: string
+      examples:
+        - https://placehold.co/60x60@2x.png
+    altTag:
+      title: Alt tag
+      type: string
+      examples:
+        - Stat icon
+    stat:
+      title: Stat
+      type: string
+      examples:
+        - 50,000+
+    label:
+      title: Label
+      type: string
+      examples:
+        - Happy customers
+    # --- Tab 2 ---
+    layout:
+      title: Layout
+      type: string
+      enum:
+        - Left aligned
+        - Center aligned
+      examples:
+        - Left aligned
+    size:
+      title: Size
+      type: string
+      enum:
+        - Large
+        - Medium
+        - Small
+      examples:
+        - Large
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - ''
+    textColor:
+      title: Text color
+      type: string
+      enum:
+        - Dark text
+        - Light text
+      examples:
+        - Dark text
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+      examples:
+        - ''
+    border:
+      title: Border
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - ''
+    padding:
+      title: Padding
+      type: string
+      enum:
+        - None
+        - Apply padding to card
+      examples:
+        - None
+    conditionallyApplyPadding:
+      title: Conditionally apply padding
+      type: string
+      examples:
+        - ''
+    height:
+      title: Height
+      type: string
+      enum:
+        - Fit to content
+        - Fill space available
+      examples:
+        - Fill space available
+    addSpaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - Add space below
+slots: []

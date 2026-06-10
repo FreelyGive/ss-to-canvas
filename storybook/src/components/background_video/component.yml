@@ -1,0 +1,40 @@
+name: Background video
+machineName: background_video
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    videoUrl:
+      title: Video URL
+      type: string
+      examples:
+        - https://www.w3schools.com/html/mov_bbb.mp4
+    backgroundImage:
+      title: Fallback image
+      type: object
+      $ref: json-schema-definitions://canvas.module/image
+      examples:
+        - src: https://placehold.co/1920x1080@2x.png
+          alt: Video fallback image
+          width: 1920
+          height: 1080
+    # --- Tab 2 ---
+    padding:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Apply padding around content
+      examples:
+        - None
+    addSpaceBelow:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - None
+slots:
+  content:
+    title: Content

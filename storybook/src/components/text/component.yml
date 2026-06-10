@@ -1,0 +1,95 @@
+name: Text
+machineName: text
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    content:
+      title: Text editor
+      type: string
+      examples:
+        - '<p>Enter some text...</p>'
+      contentMediaType: text/html
+      x-formatting-context: block
+    # --- Tab 2 ---
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - ''
+    textColor:
+      title: Text color
+      type: string
+      enum:
+        - Dark text
+        - Light text
+        - Color text
+      examples:
+        - Dark text
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+      examples:
+        - ''
+    border:
+      title: Border
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - ''
+    padding:
+      title: Padding
+      type: string
+      enum:
+        - None
+        - Apply padding around text
+      examples:
+        - None
+    conditionallyApplyPadding:
+      title: Conditionally apply padding
+      type: string
+      examples:
+        - ''
+    height:
+      title: Height
+      type: string
+      enum:
+        - Fit to content
+        - Fill available space
+      examples:
+        - Fit to content
+    addSpaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - None
+    columnLayout:
+      title: Column layout
+      type: string
+      enum:
+        - 1 Column text (Default)
+        - 2 Column text
+        - 3 Column text
+      examples:
+        - 1 Column text (Default)
+slots: []

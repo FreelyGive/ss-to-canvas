@@ -1,0 +1,195 @@
+name: Hero
+machineName: hero
+status: true
+required:
+  - layout
+  - height
+  - textColor
+  - headingTextColor
+props:
+  properties:
+    # --- Tab 1: Content ---
+    usePageTitle:
+      title: Use Page Title
+      type: boolean
+      examples:
+        - false
+    pageTitle:
+      title: Page Title
+      type: string
+      examples:
+        - Glasses
+        - Sunglasses
+        - Showrooms
+        - We design quality glasses at an upfront, honest price
+        - Virtual Try On
+    preHeading:
+      title: Pre Heading
+      type: string
+      examples:
+        - Born in Scotland
+        - New Collection
+    heading:
+      title: Heading
+      type: string
+      examples:
+        - A better way to buy eyewear.
+        - Life in focus.
+    text:
+      title: Text
+      type: string
+      contentMediaType: text/html
+      examples:
+        - <p>Discover a better way to buy glasses. Honest pricing, expert advice, and frames you'll love.</p>
+    buttonLink:
+      title: Link to Page or URL
+      type: string
+      examples:
+        - /collections/glasses
+        - /collections/sunglasses
+        - /showrooms
+        - /our-story
+        - /virtual-try-on
+        - https://support.iolla.com/
+    buttonText:
+      title: Button Text
+      type: string
+      examples:
+        - Shop glasses
+        - Visit a showroom
+        - Learn more
+    buttonTarget:
+      title: Target
+      type: string
+      enum:
+        - _self
+        - _blank
+      examples:
+        - _self
+    buttonStyle:
+      title: Button Style
+      type: string
+      enum:
+        - Link with icon
+        - Primary button blue
+        - Primary button dark blue
+        - Primary button green
+        - Primary button orange
+        - Secondary button blue
+        - Secondary button dark blue
+        - Secondary button green
+        - Secondary button orange
+        - Primary button cream
+        - Primary button dark red
+      examples:
+        - Primary button dark blue
+    showBreadcrumbs:
+      title: Show Breadcrumbs
+      type: string
+      enum:
+        - None
+        - Show breadcrumbs on transparent background
+        - Show breadcrumbs on solid dark background
+        - Show breadcrumbs on solid light background
+        - Show breadcrumbs on semi-transparent dark background
+      examples:
+        - None
+    # --- Tab 2: Layout & Style ---
+    height:
+      title: Hero Height
+      type: string
+      enum:
+        - Fluid
+        - Tall
+        - Short
+      examples:
+        - Short
+    layout:
+      title: Text and Drop Zone Layout
+      type: string
+      enum:
+        - Text centered - Drop zone below
+        - Text left - Drop zone right
+        - Text right - Drop zone left
+        - Content centered - text align centre
+        - Content left - text align centre
+        - Content right - text align centre
+      examples:
+        - Text left - Drop zone right
+    enableDropZone:
+      title: Enable Drop Zone
+      type: boolean
+      examples:
+        - false
+    backgroundImage:
+      title: Background Image
+      type: object
+      examples:
+        - src: https://iolla.ddev.site/sites/default/files/2021-04/photo-1415731958810-238ff2770b33.jpeg
+          alt: Hero background
+        - src: https://iolla.ddev.site/sites/default/files/2021-04/Robertson-MatteBronze-Optical-Front-forweb_grande.jpeg
+          alt: Glasses frame
+      $ref: json-schema-definitions://canvas.module/image
+    imageStyle:
+      title: Image Style (Desktop)
+      type: string
+      enum:
+        - Default
+        - Super wide (1360x640)
+        - Lister banner (1980x460)
+      examples:
+        - Default
+    imageStyleTablet:
+      title: Image Style (Tablet)
+      type: string
+      enum:
+        - Default
+        - Super wide (768x360)
+        - Super duper wide (1360x640)
+      examples:
+        - Default
+    imageStyleMobile:
+      title: Image Style (Mobile)
+      type: string
+      enum:
+        - Default
+        - Super wide (568x266)
+        - Super duper wide (1360x640)
+        - Small square (568x568)
+      examples:
+        - Default
+    imageOverlay:
+      title: Background Overlay
+      type: string
+      enum:
+        - None
+        - Dark overlay
+        - Light overlay
+      examples:
+        - None
+    backgroundColor:
+      title: Background Color
+      type: string
+      examples:
+        - '#002633'
+        - '#f5f2eb'
+    headingTextColor:
+      title: Heading Text Color
+      type: string
+      enum:
+        - Light
+        - Dark
+        - Colored
+      examples:
+        - Light
+    textColor:
+      title: Text Color
+      type: string
+      enum:
+        - Light
+        - Dark
+      examples:
+        - Light
+slots:
+  dropZoneContent:
+    title: Drop Zone Content

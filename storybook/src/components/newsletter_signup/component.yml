@@ -1,0 +1,10 @@
+name: Newsletter signup
+machineName: newsletter_signup
+status: true
+props:
+  properties:
+    newsletterCopy:
+      title: Newsletter copy
+      type: string
+      examples:
+        - Stay up to date with the latest frames, lens technology, and eye health advice from iolla.

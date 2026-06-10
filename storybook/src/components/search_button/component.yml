@@ -1,0 +1,11 @@
+name: Search button
+machineName: search_button
+status: true
+props:
+  properties:
+    buttonText:
+      title: Button text
+      type: string
+      examples:
+        - Search
+slots: []

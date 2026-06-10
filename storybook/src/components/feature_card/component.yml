@@ -1,0 +1,122 @@
+name: Feature card
+machineName: feature_card
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    image:
+      title: Image
+      type: object
+      $ref: json-schema-definitions://canvas.module/image
+      examples:
+        - src: https://placehold.co/80x80@2x.png
+          alt: Feature image
+          width: 80
+          height: 80
+    altTag:
+      title: Alt tag
+      type: string
+      examples:
+        - Feature image
+    headingElement:
+      title: Select
+      type: string
+      enum:
+        - Heading 2
+        - Heading 3
+        - Heading 4
+        - Heading 5
+        - Heading 6
+      examples:
+        - Heading 3
+    cardHeading:
+      title: Card heading
+      type: string
+      examples:
+        - Expert craftsmanship
+    description:
+      title: Description
+      type: string
+      examples:
+        - We take pride in every detail, from the quality of materials to the precision of our manufacturing process.
+    # --- Tab 2 ---
+    layout:
+      title: Select
+      type: string
+      enum:
+        - Left aligned with image above text
+        - Left aligned with image left of text
+        - Center aligned with image above text
+        - Left aligned with image left of text (How it works)
+      examples:
+        - Left aligned with image above text
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - '#ffffff'
+    cardTextColor:
+      title: Select
+      type: string
+      enum:
+        - Dark text
+        - Light text
+      examples:
+        - Dark text
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+    border:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    roundEdges:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Round edges
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - '#e5e7eb'
+    padding:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Apply padding to card
+      examples:
+        - Apply padding to card
+    conditionallyApplyPadding:
+      title: Conditionally apply padding if background color or border is set
+      type: string
+    fillSpace:
+      title: Select
+      type: string
+      enum:
+        - Fit to content
+        - Fill space available
+      examples:
+        - Fill space available
+    addSpaceBelow:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - Add space below

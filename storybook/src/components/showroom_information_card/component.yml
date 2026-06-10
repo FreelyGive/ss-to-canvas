@@ -1,0 +1,137 @@
+name: Showroom information card
+machineName: showroom_information_card
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    headingElement:
+      title: Heading element
+      type: string
+      enum:
+        - h1
+        - h2
+        - h3
+        - h4
+        - h5
+        - h6
+      examples:
+        - h2
+    cardHeading:
+      title: Card heading
+      type: string
+      examples:
+        - Glasgow Showroom
+    addressLine1:
+      title: Address line 1
+      type: string
+      examples:
+        - 17 Wilson Street
+    addressLine2:
+      title: Address line 2
+      type: string
+      examples:
+        - Merchant City
+    addressLine3:
+      title: Address line 3
+      type: string
+      examples:
+        - Glasgow
+    postcode:
+      title: Postcode
+      type: string
+      examples:
+        - G1 1SS
+    telephone:
+      title: Telephone
+      type: string
+      examples:
+        - +44 141 552 4520
+    openingTimes:
+      title: Opening times
+      type: array
+      items:
+        type: string
+      examples:
+        - - Mon–Fri 9am–6pm
+          - Sat 10am–5pm
+    # --- Tab 2 ---
+    layout:
+      title: Layout
+      type: string
+      enum:
+        - Left aligned with image above text
+        - Left aligned with image left of text
+        - Center aligned with image above text
+      examples:
+        - Left aligned with image above text
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - '#ffffff'
+    textColor:
+      title: Text color
+      type: string
+      enum:
+        - Dark text
+        - Light text
+      examples:
+        - Dark text
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+      examples:
+        - ''
+    border:
+      title: Border
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - '#e5e7eb'
+    padding:
+      title: Padding
+      type: string
+      enum:
+        - None
+        - Apply padding to card
+      examples:
+        - Apply padding to card
+    conditionallyApplyPadding:
+      title: Conditionally apply padding
+      type: string
+      examples:
+        - ''
+    heightBehavior:
+      title: Height behavior
+      type: string
+      enum:
+        - Fit to content
+        - Fill space available
+      examples:
+        - Fill space available
+    addSpaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - Add space below
+slots: []

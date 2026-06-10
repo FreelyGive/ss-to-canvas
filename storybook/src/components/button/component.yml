@@ -1,0 +1,34 @@
+name: Button
+machineName: button
+status: true
+required:
+  - text
+props:
+  properties:
+    variant:
+      title: Variant
+      type: string
+      examples:
+        - Solid
+      enum:
+        - Solid
+        - Outline Dark
+        - Outline Light
+        - Ghost
+        - Ghost Neutral
+        - Ghost Light
+        - Link
+        - Link Underline
+        - Link Dark
+        - Link Light
+        - Nav Link Dark
+    text:
+      title: Text
+      type: string
+      examples:
+        - Button
+    link:
+      title: Link
+      type: string
+      format: uri-reference
+slots: []

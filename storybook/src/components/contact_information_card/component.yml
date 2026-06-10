@@ -1,0 +1,142 @@
+name: Contact information card
+machineName: contact_information_card
+status: true
+props:
+  properties:
+    # --- Tab 1: Content ---
+    image:
+      title: Image
+      type: object
+      examples:
+        - src: https://placehold.co/80x80@2x.png
+          alt: Contact image
+          width: 80
+          height: 80
+      $ref: json-schema-definitions://canvas.module/image
+    imageAlt:
+      title: Alt tag
+      type: string
+      examples:
+        - Contact image
+    headingElement:
+      title: Select
+      type: string
+      enum:
+        - h2
+        - h3
+        - h4
+        - h5
+        - h6
+      examples:
+        - h3
+    cardHeading:
+      title: Card heading
+      type: string
+      examples:
+        - Get in Touch
+    contactName:
+      title: Contact name
+      type: string
+      examples:
+        - Jane Smith
+    company:
+      title: Company
+      type: string
+      examples:
+        - iolla
+    address:
+      title: Address
+      type: string
+      examples:
+        - "17 Wilson Street\nGlasgow G1 1SS"
+    telephone:
+      title: Telephone
+      type: string
+      examples:
+        - +44 141 552 4520
+    email:
+      title: Email
+      type: string
+      examples:
+        - hello@iolla.com
+    # --- Tab 2: Layout & Style ---
+    layout:
+      title: Select
+      type: string
+      enum:
+        - Left aligned with image above text
+        - Left aligned with image left of text
+        - Center aligned with image above text
+      examples:
+        - Left aligned with image above text
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - '#ffffff'
+    textColor:
+      title: Select
+      type: string
+      enum:
+        - Dark text
+        - Light text
+      examples:
+        - Dark text
+    conditionalTextColorDarkBackground:
+      title: Conditional text color dark background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorLightBackground:
+      title: Conditional text color light background
+      type: string
+      examples:
+        - ''
+    conditionalTextColorColoredBackground:
+      title: Conditional text color colored background
+      type: string
+      examples:
+        - ''
+    border:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - '#e5e7eb'
+    padding:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Apply padding to card
+      examples:
+        - Apply padding to card
+    conditionallyApplyPaddingIfBackgroundColorOrBorderIsSet:
+      title: Conditionally apply padding if background color or border is set
+      type: string
+      examples:
+        - ''
+    heightBehavior:
+      title: Select
+      type: string
+      enum:
+        - Fit to content
+        - Fill space available
+      examples:
+        - Fill space available
+    addSpaceBelow:
+      title: Select
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - None
+slots: []

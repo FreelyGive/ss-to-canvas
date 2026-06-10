@@ -1,0 +1,56 @@
+name: Tabs container
+machineName: tabs_container
+status: true
+props:
+  properties:
+    orientation:
+      title: Orientation
+      type: string
+      enum:
+        - Horizontal
+        - Vertical
+      examples:
+        - Horizontal
+    tabPosition:
+      title: Tab position
+      type: string
+      enum:
+        - Left aligned
+        - Left aligned within boxed width of grid
+        - Center aligned
+        - Right aligned
+        - Right aligned within boxed width of grid
+        - Distributed equally
+        - Distributed equally within boxed width of grid
+      examples:
+        - Left aligned
+    navigationStyle:
+      title: Navigation style
+      type: string
+      enum:
+        - Dark text with key-line
+        - Light text with key-line
+        - Solid (For any background)
+      examples:
+        - Dark text with key-line
+    spaceBetweenNavContent:
+      title: Add space between navigation and content
+      type: boolean
+      examples:
+        - true
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - ''
+    addSpaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - None
+slots:
+  items:
+    title: Tab Items

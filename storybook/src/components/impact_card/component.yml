@@ -1,0 +1,115 @@
+name: Impact card
+machineName: impact_card
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    backgroundImage:
+      title: Background image
+      type: object
+      examples:
+        - src: https://placehold.co/800x500@2x.png
+          alt: Impact card background
+          width: 800
+          height: 500
+      $ref: json-schema-definitions://canvas.module/image
+    imageOverlay:
+      title: Image overlay
+      type: string
+      enum:
+        - None
+        - Dark overlay
+        - Light overlay
+      examples:
+        - Dark overlay
+    headingElement:
+      title: Heading element
+      type: string
+      enum:
+        - Heading 2
+        - Heading 3
+        - Heading 4
+        - Heading 5
+        - Heading 6
+      examples:
+        - Heading 3
+    cardHeading:
+      title: Card heading
+      type: string
+      examples:
+        - Glasses from £49
+    description:
+      title: Description
+      type: string
+      examples:
+        - Complete pairs including single vision lenses. No hidden costs.
+    callToAction:
+      title: Call to action
+      type: string
+      examples:
+        - Shop glasses
+    link:
+      title: Link to page or URL
+      type: object
+      examples:
+        - url: /glasses
+          target: _self
+    buttonStyle:
+      title: Button style
+      type: string
+      enum:
+        - Primary button blue
+        - Primary button green
+        - Primary button orange
+        - Secondary button blue
+        - Secondary button green
+        - Secondary button orange
+      examples:
+        - Primary button blue
+    # --- Tab 2 ---
+    textColor:
+      title: Text color
+      type: string
+      enum:
+        - Light text
+        - Dark text
+      examples:
+        - Light text
+    border:
+      title: Border
+      type: string
+      enum:
+        - None
+        - Add border
+      examples:
+        - None
+    borderColor:
+      title: Border color
+      type: string
+      examples:
+        - '#ffffff'
+    minimumHeight:
+      title: Minimum height
+      type: string
+      enum:
+        - Tall
+        - Medium
+        - Shallow
+      examples:
+        - Medium
+    heightBehavior:
+      title: Height behavior
+      type: string
+      enum:
+        - Fit to minimum height
+        - Fill space available
+      examples:
+        - Fill space available
+    spaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - Add space below

@@ -1,0 +1,52 @@
+name: Grid container
+machineName: grid_container
+status: true
+required:
+  - layout
+props:
+  properties:
+    layout:
+      title: Layout
+      type: string
+      examples:
+        - 33-33-33
+      enum:
+        - 50-50
+        - 33-33-33
+        - 75-25
+        - 25-75
+        - 67-33
+        - 33-67
+        - 50-25-25
+        - 25-25-50
+        - 25-25-25-25
+      meta:enum:
+        50-50: 50-50
+        33-33-33: 33-33-33
+        75-25: 75-25
+        25-75: 25-75
+        67-33: 67-33
+        33-67: 33-67
+        50-25-25: 50-25-25
+        25-25-50: 25-25-50
+        25-25-25-25: 25-25-25-25
+    gap:
+      title: Gap
+      type: string
+      examples:
+        - Medium
+      enum:
+        - Extra Small
+        - Small
+        - Medium
+        - Large
+        - Extra Large
+      meta:enum:
+        Extra Small: Extra Small
+        Small: Small
+        Medium: Medium
+        Large: Large
+        Extra Large: Extra Large
+slots:
+  content:
+    title: Content

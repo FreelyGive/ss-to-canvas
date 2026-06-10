@@ -1,0 +1,30 @@
+name: Tab item
+machineName: tab_item
+status: true
+required:
+  - navigationLabel
+props:
+  properties:
+    # --- Tab 1 ---
+    navigationLabel:
+      title: Navigation label
+      type: string
+      examples:
+        - Single Vision
+    # --- Tab 2 ---
+    backgroundColor:
+      title: Background color
+      type: string
+      examples:
+        - ''
+    padding:
+      title: Padding
+      type: string
+      enum:
+        - None
+        - Apply padding around content
+      examples:
+        - Apply padding around content
+slots:
+  content:
+    title: Content

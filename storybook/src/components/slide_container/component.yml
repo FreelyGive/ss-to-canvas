@@ -1,0 +1,121 @@
+name: Slide container
+machineName: slide_container
+status: true
+props:
+  properties:
+    # --- Tab 1 ---
+    desktopShow:
+      title: Desktop show
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      examples:
+        - 1
+    desktopScroll:
+      title: Desktop scroll
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      examples:
+        - 1
+    tabletShow:
+      title: Tablet show
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      examples:
+        - 1
+    tabletScroll:
+      title: Tablet scroll
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      examples:
+        - 1
+    phoneShow:
+      title: Phone show
+      type: number
+      enum:
+        - 1
+        - 2
+      examples:
+        - 1
+    phoneScroll:
+      title: Phone scroll
+      type: number
+      enum:
+        - 1
+        - 2
+      examples:
+        - 1
+    showNavigation:
+      title: Show navigation
+      type: boolean
+      examples:
+        - false
+    navigationStyle:
+      title: Navigation style
+      type: string
+      enum:
+        - Semi-transparent buttons
+        - Color arrows
+        - Dark arrows
+        - Light arrows
+      examples:
+        - Semi-transparent buttons
+    showPagination:
+      title: Show pagination
+      type: boolean
+      examples:
+        - false
+    paginationPosition:
+      title: Pagination position
+      type: string
+      enum:
+        - Over slides
+        - Below slides
+      examples:
+        - Over slides
+    spaceBetweenSlides:
+      title: Space between slides
+      type: string
+      enum:
+        - Retain space between slides
+        - No space between slides
+      examples:
+        - Retain space between slides
+    spaceLeftRight:
+      title: Space left and right
+      type: string
+      enum:
+        - No space
+        - Add space to the left and right of slides
+      examples:
+        - No space
+    addSpaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below
+      examples:
+        - Add space below
+slots:
+  slides:
+    title: Slides

@@ -1,0 +1,23 @@
+name: Text and image layout
+description: Two-column layout with image panel and content drop zone (cpt_text_and_image_layout).
+props:
+  - name: backgroundColor
+    type: color
+    label: Background colour
+  - name: image
+    type: image
+    label: Image
+  - name: imagePosition
+    type: select
+    label: Image position
+    options:
+      - Image on left
+      - Image on right
+    default: Image on right
+  - name: overflowHidden
+    type: boolean
+    label: Overflow Hidden
+    default: false
+slots:
+  - name: content
+    label: Content

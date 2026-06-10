@@ -1,0 +1,91 @@
+{
+  "name": "my-project",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@drupal-canvas/vite-plugin": "^0.1.1",
+    "@freelygive/canvas-utils": "^0.3.4",
+    "class-variance-authority": "^0.7.1",
+    "drupal-canvas": "^0.4.1",
+    "drupal-jsonapi-params": "^3.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "swr": "^2.3.8",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@drupal-canvas/cli": "^0.18.0",
+    "canvas-cc-starter": "github:balintbrews/canvas-starter",
+    "@drupal-canvas/eslint-config": "^0.1.0",
+    "@eslint/js": "^9.39.1",
+    "@freelygive/canvas-jsonapi": "^0.2.1",
+    "@freelygive/npm-scaffold": "^0.3.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@playwright/cli": "^0.1.1",
+    "@storybook/addon-docs": "^10.0.8",
+    "@storybook/addon-mcp": "^0.1.7",
+    "@storybook/addon-vitest": "^10.2.0",
+    "@storybook/react-vite": "^10.0.8",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/node": "^25.2.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react-swc": "^4.2.2",
+    "@vitest/browser-playwright": "^4.0.17",
+    "@vitest/coverage-v8": "^4.0.17",
+    "baseline-browser-mapping": "^2.8.32",
+    "eslint": "^9.39.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "eslint-plugin-storybook": "10.0.8",
+    "globals": "^16.5.0",
+    "js-yaml": "^4.1.1",
+    "lint-staged": "^16.2.6",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "storybook": "^10.1.9",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.2.4",
+    "vite-tsconfig-paths": "^6.0.5",
+    "vitest": "^4.0.17"
+  },
+  "lint-staged": {
+    "*.{js,jsx,json,html,md,mdx,yml}": "prettier --write",
+    "*.{js,jsx}": "eslint --fix"
+  },
+  "npmScaffold": {
+    "allowed-packages": [
+      "@freelygive/canvas-jsonapi",
+      "@freelygive/canvas-utils"
+    ],
+    "base-path": "src",
+    "locations": {
+      "skills": ".claude/skills"
+    }
+  },
+  "scripts": {
+    "dev": "storybook dev -p 6006 --no-open --host 0.0.0.0",
+    "restart": "supervisorctl restart webextradaemons:storybook",
+    "build": "storybook build",
+    "code:check": "run-s -c -n code:check:**",
+    "code:check:prettier": "npm run s:prettier -- --check",
+    "code:check:eslint": "npm run s:eslint",
+    "code:check:typecheck": "tsc --noEmit",
+    "code:fix": "run-s -c -n code:fix:**",
+    "code:fix:prettier": "npm run s:prettier -- --write",
+    "code:fix:eslint": "npm run s:eslint -- --fix",
+    "s:prettier": "prettier \"**/*.{js,jsx,json,html,md,mdx,yml}\"",
+    "s:eslint": "eslint \"**/*.{js,jsx,yml,yaml}\"",
+    "canvas:pull": "canvas pull --yes",
+    "canvas:push": "canvas push --yes",
+    "canvas:validate": "canvas validate --yes",
+    "canvas:push:local": "sh -c 'set -a && . ./.env && set +a && canvas push --yes --site-url \"$CANVAS_LOCAL_SITE_URL\" --client-id \"$CANVAS_LOCAL_CLIENT_ID\" --client-secret \"$CANVAS_LOCAL_CLIENT_SECRET\"'",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "content": "canvas-jsonapi",
+    "postinstall": "npm-scaffold && mkdir -p ../.claude/reference && ln -sfn ../node_modules/canvas-cc-starter/.agents/skills ../.claude/reference/canvas-starter"
+  }
+}

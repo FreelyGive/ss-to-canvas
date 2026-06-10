@@ -1,0 +1,23 @@
+name: Video
+machineName: video
+status: true
+required:
+  - src
+props:
+  properties:
+    # --- Tab 1 ---
+    src:
+      title: Video media
+      type: string
+      examples:
+        - /ui/assets/videos/mountain_wide.mp4
+    # --- Tab 2 ---
+    addSpaceBelow:
+      title: Space below
+      type: string
+      enum:
+        - None
+        - Add space below video
+      examples:
+        - Add space below video
+slots: []
