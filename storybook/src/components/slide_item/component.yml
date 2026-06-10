@@ -1,8 +1,0 @@
-name: Slide item
-machineName: slide_item
-status: true
-props:
-  properties: []
-slots:
-  content:
-    title: Content
