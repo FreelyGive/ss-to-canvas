@@ -12,9 +12,35 @@ that names, props, and structure are directly comparable between the two systems
 This skill is project-agnostic. All project-specific values (URLs, component
 names, brand colours, machine name lists) are supplied at invocation time.
 
-**Before starting**, establish two project variables used throughout:
+**Before starting**, establish three project variables used throughout:
 - `SITE_URL` — the local development URL, e.g. `https://mysite.ddev.site`
+- `STORYBOOK_URL` — the Storybook URL. When Storybook runs as a DDEV service
+  behind Traefik (see `.ddev/docker-compose.storybook.yaml`), this is
+  `https://storybook.<sitename>.ddev.site` (e.g. `https://storybook.mysite.ddev.site`)
+  — use it instead of `http://localhost:6006` everywhere, including curl checks
+  and agent-browser screenshots. Use `curl -k` / accept self-signed certs.
 - `DRUSH` — the drush command for your environment, e.g. `ddev drush` or `drush`
+
+---
+
+## MANDATORY execution order — do not reorder, do not skip
+
+A previous run skipped Phase 0 and Phase 4 entirely and produced a 5%-quality
+result: unstyled header/footer, missing menu pages, invented styles, and no
+visual verification. Every phase below is a **hard gate** — do not start the
+next phase until the current one passes its checklist.
+
+| Phase | What | Gate to pass before next phase |
+|-------|------|--------------------------------|
+| **0** | Pull ALL SS configuration: colors, fonts, base styles, **custom styles**, website settings, master/menu templates, main + footer menus. Build **styled** Header and Footer from the real rendered site. | Header and Footer screenshots visually match the live site (agent-browser comparison, see Phase 0g). |
+| **1** | Extract component field maps (Drush). | Every SS component has a field map or a documented exclusion. |
+| **2** | Write components + component stories. | Field count audit passes; clean build. |
+| **3** | Extract node canvas data and write page stories for **every main-menu and footer-menu page**. | Menu-coverage diff passes (see "Page coverage gate"). |
+| **4** | **Visual QA with agent-browser** — screenshot every component story and every page story against the live Drupal equivalent; fix discrepancies; re-screenshot. | Every page story's side-by-side comparison reviewed and discrepancies fixed. Nothing is "done" until this passes. |
+
+**A component or page story that has not been visually compared against the
+live Drupal site with agent-browser is not finished.** Reporting completion
+without Phase 4 is a failure, regardless of build status.
 
 ---
 
@@ -95,8 +121,19 @@ word (e.g. `link`, `text`), append a disambiguator (e.g. `link_button`).
 
 ### Prop names = Site Studio form field labels (camelCase)
 
-Convert the SS form field label to camelCase for JS props. Do **not** invent
-names — derive them from the SS field labels.
+**Hard rule: never invent prop names. Every prop must be the camelCase of the
+exact label string shown in the SS form editor UI (i.e. `$node['settings']['title']`
+from `json_values`).** A paraphrase or synonym is wrong even if it sounds more
+natural. Examples of violations:
+
+| SS label (correct source) | Wrong (invented) | Correct prop |
+|---------------------------|------------------|--------------|
+| Text vertical alignment | `contentVerticalAlign` | `textVerticalAlignment` |
+| Background colour | `bgColor` | `backgroundColour` |
+| Show on mobile | `mobileVisible` | `showOnMobile` |
+
+Run the field-extraction command below **before writing any component** and use
+the output verbatim — do not rename, abbreviate, or rephrase:
 
 ```bash
 $DRUSH ev "
@@ -116,6 +153,42 @@ extract_fields(\$json['componentForm']);
 " 2>/dev/null
 ```
 
+#### Prop name audit (run after writing every component)
+
+After writing a component, cross-check every prop name in the JSX/TSX against
+the SS field titles extracted above. The audit command:
+
+```bash
+# 1. Extract SS field titles for a component (produces the canonical list)
+$DRUSH ev "
+\$e = \Drupal::service('entity_type.manager')
+  ->getStorage('cohesion_component')
+  ->load('cpt_MY_COMPONENT');
+\$json = json_decode(\$e->get('json_values'), true);
+function extract_fields(\$nodes) {
+  foreach (\$nodes as \$node) {
+    if (isset(\$node['type']) && \$node['type'] === 'form-field') {
+      \$label = \$node['settings']['title'] ?? \$node['title'] ?? '';
+      // Convert label → camelCase
+      \$camel = lcfirst(str_replace(' ', '', ucwords(strtolower(\$label))));
+      echo \$camel . ' (from: ' . \$label . ')' . PHP_EOL;
+    }
+    if (!empty(\$node['children'])) extract_fields(\$node['children']);
+  }
+}
+extract_fields(\$json['componentForm']);
+" 2>/dev/null
+
+# 2. List props used in the Storybook component file
+grep -oE "([a-z][a-zA-Z]+)\s*[=?:]" storybook/src/components/MY_COMPONENT/index.jsx \
+  | grep -v "className\|onClick\|onChange\|onNavigate\|href\|key\|src\|alt\|style\|ref\|aria" \
+  | sort -u
+```
+
+Compare the two lists. Any prop in the Storybook file that does **not** appear
+in the SS camelCase list is a naming violation and must be renamed before the
+component is considered done.
+
 ### Storybook-only components (no SS equivalent)
 
 Some Storybook components are layout helpers or compositions with no direct SS
@@ -129,36 +202,26 @@ counterpart. Group these under sub-folders:
 - `Components/Assets/Image`
 - `Components/Assets/Video`
 
-**Project-specific custom compositions** with no SS counterpart:
-
-| Storybook component | What it approximates in SS |
-|---------------------|---------------------------|
-| `ProofStrip` + `ProofItem` | A `cpt_container` (coloured bg) containing a column layout with individual `cpt_stat_card` or `cpt_impact_card` components dropped in. There is no single `cpt_proof_strip` in the SS library. |
+**Project-specific custom compositions** with no SS counterpart should be
+documented in a project-local table (not in this skill file). Add an entry for
+each composition explaining which SS components it approximates and why there is
+no single SS machine name for it.
 
 ### SS-only components (no Storybook story needed)
 
-Some SS components intentionally have no Storybook counterpart. Document them here
-with the reason, so the completeness audit knows to skip them:
+Some SS components intentionally have no Storybook counterpart. Document them
+in the project's skill notes with the reason, so the completeness audit knows to
+skip them. Common examples:
 
-| SS machine name | SS label | Reason excluded |
-|-----------------|----------|-----------------|
-| `cpt_drupal_blocks` | Drupal blocks | Renders arbitrary Drupal block regions — not reproducible in Storybook without a Drupal backend |
-| `cpt_test_covet_img` | Test Covet Img | Dev/test artifact — not a real content component |
-| `cpt_site_header` | Site header | Rendered via the `Header` Storybook component instead |
-| `cpt_site_footer` | Site footer | Rendered via the `Footer` Storybook component instead |
-| `cpt_drupal_blocks` | Drupal blocks | Backend-only; no meaningful frontend render |
+| SS machine name pattern | Reason excluded |
+|-------------------------|-----------------|
+| `cpt_drupal_blocks` | Renders arbitrary Drupal block regions — not reproducible in Storybook without a Drupal backend |
+| `cpt_site_header` | Rendered via the `Header` Storybook component instead |
+| `cpt_site_footer` | Rendered via the `Footer` Storybook component instead |
+| Dev/test artifacts | Not real content components — skip and document |
 
-**SS components still needing Storybook stories** (iolla project — as of 2026-06-10):
-
-| SS machine name | SS label | Status |
-|-----------------|----------|--------|
-| `cpt_gift_card_howto_options` | Gift Card how-to options | Missing story |
-| `cpt_hero_slide_container` | Hero slide container (autoplay & fade) | Missing story |
-| `cpt_instagram_feed_gallery` | Social Images Gallery | Missing story |
-| `cpt_product_slider` | Product slider | Missing story |
-| `cpt_reviews_io_slider` | Reviews.io slider | Missing story |
-| `cpt_text_and_video_layout` | Text and video layout | Missing story |
-| `1dc117b7` | Slide container (legacy ID) | Missing story — verify if same as `cpt_hero_slide_container` |
+After the completeness audit, record any remaining open questions in the
+project's own notes (not here), so this skill file stays project-agnostic.
 
 Project-specific custom compositions that predate naming discipline should be
 renamed only when rebuilt from SS.
@@ -171,7 +234,7 @@ Before starting any component or page work, verify the Storybook dev server and 
 
 ```bash
 # 1. Confirm the Storybook dev server is running and reachable
-curl -s -o /dev/null -w "%{http_code}" http://localhost:6006
+curl -sk -o /dev/null -w "%{http_code}" $STORYBOOK_URL
 # Expected: 200
 
 # 2. Confirm the Drupal site is up (DDEV or remote)
@@ -201,16 +264,21 @@ above, then filling in the Storybook column:
 
 ---
 
-## Global styles — sync SS design tokens to Storybook before component work
+## Phase 0 — Pull ALL SS configuration BEFORE any component work
 
-**Do this once per project setup, and revisit whenever SS website settings change.**
+**This phase is mandatory and comes first.** Do it once per project setup, and
+revisit whenever SS website settings change. Skipping it means every component
+is styled by guesswork instead of by the real SS configuration.
 
-SS has three global style layers that Storybook must mirror in `src/components/global.css`
-so components render correctly without the Drupal theme loaded:
+SS has **six** global configuration layers that Storybook must mirror so
+components render correctly without the Drupal theme loaded:
 
 1. **Color palette** (`cohesion_color` entities) — the SS `$coh-color-*` variables
 2. **Font library** (`cohesion_font_library` entities) — `@import` URLs for web fonts
 3. **Base styles** (`cohesion_base_styles` entities) — element-level rules (h1–h6, p, body, a, button)
+4. **Custom styles** (`cohesion_custom_style` entities) — every `coh-style-*` class (buttons, text colors, padding helpers). These are the values that appear in component select options; their real CSS lives in the compiled stylesheets.
+5. **Website settings** (`cohesion_website_settings` entities) — breakpoints, max page width, responsive grid settings
+6. **Templates** (`cohesion_master_templates`, `cohesion_menu_templates`) — page shell layout and menu markup/styling
 
 ### Step G1 — Pull the color palette
 
@@ -279,6 +347,107 @@ Fonts from `cohesion_font_library` are Typekit/Google `@import` URLs. Add them t
 `src/global.css` so they load in Storybook. Reference them in `@theme` via
 `--font-<name>` custom properties, then use `font-family: var(--font-<name>)` in
 component CSS. Never hardcode font stack strings in component files.
+
+### Step G5 — Pull custom styles and their REAL compiled CSS
+
+Component select options reference `coh-style-*` classes (e.g.
+`coh-style-primary-button-dark-blue`, `coh-style-padding-top-bottom-large`).
+**Never invent the CSS for these classes** — extract the real rules from the
+site's compiled stylesheets.
+
+```bash
+# 1. List all SS custom styles (id | label | class)
+$DRUSH ev "
+\$storage = \Drupal::entityTypeManager()->getStorage('cohesion_custom_style');
+\$ids = \$storage->getQuery()->accessCheck(FALSE)->execute();
+foreach (\$storage->loadMultiple(\$ids) as \$e) {
+  \$a = \$e->toArray();
+  echo \$e->id() . ' | ' . \$e->label() . ' | ' . (\$a['class_name'] ?? '') . ' | type=' . (\$a['custom_style_type'] ?? '') . PHP_EOL;
+}
+" 2>/dev/null | sort
+
+# 2. Download the compiled stylesheets once into a scratch dir
+mkdir -p /tmp/ss-css
+curl -sk $SITE_URL/ | grep -oE 'href="[^"]*\.css[^"]*"' | sed 's/href="//;s/"$//' | sort -u
+# Download each cohesion/theme stylesheet listed:
+curl -sk "<stylesheet-url>" -o /tmp/ss-css/<name>.css
+
+# 3. Extract the real CSS for any coh-style-* class before writing its lookup-map entry
+grep -o '\.coh-style-primary-button-dark-blue[^{]*{[^}]*}' /tmp/ss-css/*.css
+```
+
+When a component's lookup map translates an SS class to Tailwind (button
+styles, padding helpers, text colors), the Tailwind utilities must reproduce
+the extracted CSS — same colors, padding, font, letter-spacing, hover state.
+Keep `/tmp/ss-css/` around for the whole session; every component writer
+should grep it rather than guessing.
+
+### Step G6 — Pull website settings (breakpoints, max width, grid)
+
+```bash
+$DRUSH ev "
+\$storage = \Drupal::entityTypeManager()->getStorage('cohesion_website_settings');
+\$ids = \$storage->getQuery()->accessCheck(FALSE)->execute();
+foreach (\$storage->loadMultiple(\$ids) as \$e) {
+  echo '=== ' . \$e->id() . ' | ' . \$e->label() . ' ===' . PHP_EOL;
+  echo \$e->toArray()['json_values'] . PHP_EOL;
+}
+" 2>/dev/null
+```
+
+Use the max page width for the boxed-layout container (`max-w-*` on layout
+components) and the breakpoints for any responsive lookup maps. Do not assume
+Tailwind's defaults match the SS grid.
+
+### Step G7 — Build STYLED Header and Footer from the real site (gate for Phase 0)
+
+The Header and Footer appear on every page story, so they must be pixel-faithful
+**before** any page work starts. A previous run shipped an unstyled footer menu
+and no real main menu — that is what this step prevents.
+
+1. **Menu structure** — pull main + footer menus from Drupal (command in the
+   "Which pages to build stories for" section below). Use labels, URLs, order,
+   and nesting verbatim.
+
+2. **Menu templates** — list them so you know how each menu is rendered:
+
+```bash
+$DRUSH ev "
+\$storage = \Drupal::entityTypeManager()->getStorage('cohesion_menu_templates');
+\$ids = \$storage->getQuery()->accessCheck(FALSE)->execute();
+foreach (\$storage->loadMultiple(\$ids) as \$e) { echo \$e->id() . ' | ' . \$e->label() . PHP_EOL; }
+" 2>/dev/null
+```
+
+3. **Real rendered markup + styles** — the live page is the source of truth for
+   header/footer styling. Extract the rendered HTML and match its classes
+   against the compiled CSS from Step G5:
+
+```bash
+curl -sk $SITE_URL/ | sed -n '/<header/,/<\/header>/p' > /tmp/ss-css/header.html
+curl -sk $SITE_URL/ | sed -n '/<footer/,/<\/footer>/p' > /tmp/ss-css/footer.html
+```
+
+   Reproduce in the Storybook Header/Footer: same background colors, font
+   sizes, casing (uppercase nav?), spacing, column structure, hover states,
+   dropdown/flyout behaviour for nested menu items, and the real logo.
+
+4. **Visual gate** — screenshot both and compare before moving on:
+
+```bash
+mkdir -p /tmp/qa
+agent-browser open $SITE_URL/
+agent-browser wait 2000
+agent-browser screenshot /tmp/qa/live-home.png --full-page
+
+agent-browser open "$STORYBOOK_URL/iframe.html?id=<header-story-id>&viewMode=story"
+agent-browser wait 1000
+agent-browser screenshot /tmp/qa/sb-header.png
+```
+
+   Read both screenshots and compare the header and footer regions. Fix every
+   discrepancy (fonts, colors, spacing, missing menu items, missing dropdowns)
+   and re-screenshot. **Phase 0 is not complete until they match.**
 
 ---
 
@@ -397,6 +566,15 @@ one for body text. These must be two distinct props (e.g. `headingTextColor` and
 **Drop zone**: when `enableDropZone` is true, render a named slot
 (`dropZoneContent`) alongside the text column. In stories, pass a placeholder
 `<div>` as the slot value.
+
+**Drop zone content must be verified in the canvas model, not assumed.** A
+`component-drop-zone` node appearing in the canvas tree is not evidence that it
+contains anything. Always walk its `children` array in the extracted model data
+to confirm before passing children to the component in a story. If the drop zone
+has no children, set `enableDropZone={false}` and pass nothing. Content found
+near a component in the canvas (e.g. a sibling container immediately after the
+hero) must never be assumed to belong to that component's drop zone — trace each
+component's UUID through the model independently.
 
 ### Step 4 — Seed Drupal-data fields with real database values
 
@@ -613,26 +791,56 @@ grep -c "control:" storybook/src/stories/components/my_component.stories.tsx
 count. Repeater sub-fields count as one prop (the array). `form-input-hidden`
 conditional fields count individually.
 
-### Step 9 — Take a screenshot to verify layout
+### Step 9 — MANDATORY visual comparison with agent-browser
 
-Verify the component in your local Storybook, then compare against the Drupal
-rendering:
+A component story is **not done** when the build passes — it is done when its
+rendering has been visually compared against the same component on the live
+Drupal site and discrepancies fixed. Skipping this step is how a previous run
+ended at 5% quality.
 
+1. Find a live page that uses the component (search node canvases for the
+   `componentId`, or use a page already extracted in Phase 3).
+
+2. Screenshot both sides:
+
+```bash
+mkdir -p /tmp/qa
+# Live Drupal page containing the component
+agent-browser open $SITE_URL/<page-using-component>
+agent-browser wait 2000
+agent-browser screenshot /tmp/qa/drupal--<component>.png --full-page
+
+# Storybook story (iframe.html = no Storybook chrome)
+agent-browser open "$STORYBOOK_URL/iframe.html?id=<story-id>&viewMode=story"
+agent-browser wait 1000
+agent-browser screenshot /tmp/qa/sb--<component>.png --full-page
 ```
-# Storybook (example — check your local port)
-http://localhost:6006
 
-# Drupal node edit
-$SITE_URL/node/NID/edit
-```
+   Story ID derivation: lowercase the title, replace `/` and spaces with `-`,
+   append `--default` (e.g. `Components/Hero/Hero` → `components-hero-hero--default`).
+
+3. **Read both screenshots** and compare: typography (family, size, weight,
+   casing, letter-spacing), colors (text, background, buttons), spacing,
+   alignment, image sizing, hover-visible affordances.
+
+4. Fix every discrepancy in the component, re-screenshot, re-compare. Only
+   then emit the report line.
+
+If no live page uses the component, note that in the report line and compare
+against the SS component preview (`$SITE_URL/admin/cohesion/components/components`)
+instead.
 
 ### Step 10 — Emit the per-component report line
 
 After each component is complete, print:
 
 ```
-✅ cpt_my_component | My Component | SS fields: 12 | SB props: 12 | ⏱ 3m45s | 🪙 ~10k tokens
+✅ cpt_my_component | My Component | SS fields: 12 | SB props: 12 | 👁 visual QA: pass | ⏱ 3m45s | 🪙 ~10k tokens
 ```
+
+`👁 visual QA` is `pass` only after the Step 9 agent-browser comparison was
+actually performed and discrepancies fixed. `not run` is a failure state, not
+a neutral one.
 
 At the end of a batch, print the session report:
 
@@ -642,12 +850,17 @@ At the end of a batch, print the session report:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Components completed : N
 Field match rate     : N/N (100%)
+Visual QA            : N/N components compared, N/N pages compared
+Menu page coverage   : N/N main-menu + footer-menu pages have stories
 Total time           : Xm Ys
 Total tokens (est.)  : ~Xk
 
 Component breakdown:
-  ✅ cpt_my_component | N/N fields | Xm Ys | ~Xk tokens
+  ✅ cpt_my_component | N/N fields | visual QA: pass | Xm Ys | ~Xk tokens
   ...
+Page breakdown:
+  ✅ Pages/My Page | /my-page-path | visual QA: pass
+  ⛔ Pages excluded: <url> — <reason>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -695,6 +908,23 @@ This gives you the **canonical** list — every link label, URL, and nesting lev
 
 Resolve each URL to a node ID, then extract canvas data from each node using `ss-node-extractor` before writing the story. Do not use placeholder content for menu pages.
 
+### Page coverage gate — every menu page gets a story, verified by diff
+
+Building "some" menu pages is not acceptable. Before reporting page work as
+done, diff the menu list against the page stories that actually exist:
+
+```bash
+# Left side: every URL in main + footer menus (from the Drush command above)
+# Right side: page stories present
+grep -rh "title: 'Pages/" storybook/src/stories/pages/*.stories.tsx | sort
+```
+
+Every main-menu and footer-menu URL must map to a page story, **or** appear in
+an explicit exclusion list in the session report with a reason (e.g. "external
+URL", "pure embeddable HTML blob — no SS components"). A menu page silently
+missing a story fails the gate. Pages that are HTML blobs still get a story if
+they are linked from the menu — reproduce the blob content verbatim.
+
 **Page stories must be exact reproductions of the live Drupal page.** Use the
 same text, headings, images, layouts, colors, and component order as configured
 in the actual node. Do not use placeholder content or placeholder images in page
@@ -712,21 +942,37 @@ identical.
 - **Component stories** (`storybook/src/stories/components/`) use `placehold.co` placeholder images — they demonstrate the component in isolation, not a real page
 - **Page stories** (`storybook/src/stories/pages/`) use real Drupal content: real images from `$SITE_URL/sites/default/files/...`, real headings, real text, real background colours — never `placehold.co`
 
-### Page-level quality control — visual comparison
+### Page-level quality control — MANDATORY agent-browser visual comparison
 
-After writing a page story, screenshot both and compare:
+A page story is **not finished when it builds** — it is finished when its
+full-page screenshot has been compared side-by-side against the live Drupal
+page and every discrepancy fixed. This is a hard gate for every page story,
+no exceptions.
 
+```bash
+mkdir -p /tmp/qa
+
+# Live Drupal page
+agent-browser open $SITE_URL/my-page-path
+agent-browser wait 2000
+agent-browser screenshot /tmp/qa/drupal--my-page.png --full-page
+
+# Storybook story (iframe.html = no Storybook chrome)
+agent-browser open "$STORYBOOK_URL/iframe.html?id=pages-my-page--default&viewMode=story"
+agent-browser wait 1000
+agent-browser screenshot /tmp/qa/sb--my-page.png --full-page
 ```
-# Drupal page
-playwright screenshot $SITE_URL/my-page-path
 
-# Storybook story
-playwright screenshot http://localhost:6006/iframe.html?id=pages-my-page--default
-```
+Then **Read both PNG files** and compare top-to-bottom. Fix discrepancies in
+the story (or in the underlying component if the bug is structural),
+re-screenshot, re-compare. Repeat until the two images look identical at a
+glance. Record the comparison result per page in the session report.
 
 Common discrepancies to check: background image missing, overlay colour wrong,
 heading/text colour wrong, layout alignment different, section spacing different,
-**section background colour missing**, **columns stacking instead of sitting side by side**.
+**section background colour missing**, **columns stacking instead of sitting side by side**,
+**header nav missing items or dropdowns**, **footer menu unstyled**, wrong font
+family/casing, missing real product/content imagery.
 
 ### Auditing section background colours (required for every page story)
 
@@ -799,7 +1045,7 @@ SS applies these classes to every rendered image element:
 /* cohesion/css/dist/elements/image/image.css */
 .coh-image { display: block; width: 100%; max-width: 100%; height: auto; }
 
-/* iolla-theme-stylesheet.min.css */
+/* <project>-theme-stylesheet.min.css */
 .coh-image-responsive-xl { display: block; width: 100%; }
 ```
 
@@ -945,8 +1191,8 @@ components**), do not invent a single wrapper component for it. Instead:
 2. In the page story, reproduce it with the layout primitive components it's
    actually built from (`cpt_container`, `cpt_3_column_layout`, individual
    `cpt_stat_card`, etc.)
-3. If a convenience wrapper component already exists (e.g. `ProofStrip`), note in
-   the story file that it has no SS equivalent and is an approximation.
+3. If a convenience wrapper component already exists, note in the story file
+   that it has no SS equivalent and is an approximation.
 
 ---
 
@@ -960,23 +1206,18 @@ invented icon. Fetch the logo URL from the live site HTML:
 curl -s $SITE_URL/ | grep -o 'src="[^"]*logo[^"]*"' | head -3
 ```
 
-Use the absolute URL (prepend `$SITE_URL` if the `src` is root-relative). For
-iolla, the logo is:
+Use the absolute URL (prepend `$SITE_URL` if the `src` is root-relative).
 
-```
-https://iolla.ddev.site/sites/default/files/2021-05/logo-retina.png
-```
-
-Set this as an `<img>` in the `IollaLogo` (or equivalent) sub-component inside
-`header/index.jsx`. The `logo-retina.png` is a 2× retina image — set `width` to
-half the natural pixel width so it renders at the correct visual size:
+Set this as an `<img>` in the site logo sub-component inside `header/index.jsx`.
+If the logo is a 2× retina image, set `width` to half the natural pixel width
+so it renders at the correct visual size:
 
 ```jsx
-const IollaLogo = () => (
+const SiteLogo = () => (
   <img
-    src="https://iolla.ddev.site/sites/default/files/2021-05/logo-retina.png"
-    alt="Iolla logo"
-    className="h-auto w-[121px]"
+    src="$SITE_URL/path/to/logo.png"
+    alt="Site logo"
+    className="h-auto w-[NNpx]"
   />
 );
 ```
@@ -1043,12 +1284,98 @@ with `-`, removes special characters, appends `--default`.
 
 If a path has no entry in `PAGE_LINKS`, the link falls back to its `href`.
 
+### Homepage story is required
+
+The homepage (`/`) must always have a page story (`Pages/Home`). It is the entry point for Storybook navigation — clicking the site logo navigates to `/`, which resolves to `pages-home--default`.
+
+After building all other page stories, build the homepage last:
+1. Find the homepage node via `ddev drush ev "\$n = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties(['path' => '/']); ..."` or check which node has the `/` path alias
+2. Extract canvas data with `ss-node-extractor`
+3. Write `storybook/src/stories/pages/home.stories.tsx`
+4. Register `'/'` → `'pages-home--default'` in `pageLinks.ts`
+
+### Link health check — all pageLinks entries must return 200
+
+After adding or changing any entry in `pageLinks.ts`, verify every registered path returns HTTP 200 from both Storybook and Drupal:
+
+```bash
+python3 << 'PYEOF'
+import subprocess, re
+with open('storybook/src/stories/shared/pageLinks.ts') as f:
+    content = f.read()
+pairs = re.findall(r"'(/[^']+)':\s*'([^']+)'", content)
+STORYBOOK = STORYBOOK_URL   # e.g. 'https://storybook.mysite.ddev.site'
+DRUPAL = SITE_URL           # e.g. 'https://mysite.ddev.site'
+failures = []
+for path, story_id in pairs:
+    sb = subprocess.run(['curl','-sk','-o','/dev/null','-w','%{http_code}',f"{STORYBOOK}/iframe.html?id={story_id}&viewMode=story"],capture_output=True,text=True,timeout=10).stdout.strip()
+    dr = subprocess.run(['curl','-sk','-o','/dev/null','-w','%{http_code}','-L',f"{DRUPAL}{path}"],capture_output=True,text=True,timeout=10).stdout.strip()
+    ok = sb=='200' and dr in('200','301','302')
+    print(f"{'✓' if ok else '✗'} {path} → SB:{sb} Drupal:{dr}")
+    if not ok: failures.append(path)
+print('\nAll OK ✓' if not failures else f"\nFAILED: {failures}")
+PYEOF
+```
+
+All output must show `✓`. Fix any `✗` before marking Phase 3 or Phase 4 complete.
+
+### Footer navigation must be wired
+
+The `Footer` component accepts `onNavigate` just like `Header`. Internal links (those not starting with `http`) must call `onNavigate`. Always pass it in `PageLayout` and in any bare `<Footer>` usage:
+
+```tsx
+<Footer onNavigate={navigateToStory} />
+```
+
+`PageLayout` wires both Header and Footer automatically — prefer it over bare usage.
+
+### MANDATORY: every page story must wire navigation
+
+**Every page story must pass `onNavigate={navigateToStory}` to `<Header>`.** Without it, clicking header nav links navigates to the live Drupal site instead of staying in Storybook.
+
+**Two correct patterns — use one consistently:**
+
+**Option A — bare Header (most common):**
+```tsx
+import { navigateToStory } from '../shared/pageLinks.js';
+// ...
+<Header onNavigate={navigateToStory} />
+```
+Note: use the relative path `'../shared/pageLinks.js'` — the `@/` alias only covers `src/components/*` and will fail to resolve `src/stories/*`.
+
+**Option B — PageLayout wrapper (already wired internally):**
+```tsx
+import { PageLayout } from '../layouts/PageLayout.stories';
+// ...
+<PageLayout>
+  {/* content */}
+</PageLayout>
+```
+
+**Never write `<Header />` without `onNavigate`.** Never write `onNavigate={undefined}`. After writing any batch of page stories, audit with:
+```bash
+for f in storybook/src/stories/pages/*.stories.tsx; do
+  if ! grep -q "PageLayout" "$f" && ! grep -q "onNavigate={navigateToStory}" "$f"; then
+    echo "MISSING onNavigate: $f"
+  fi
+done
+```
+All output should be empty. Fix any that appear.
+
 ---
 
 ## Parallel agent strategy for faster component generation
 
 The SS→Storybook workflow can run significantly faster using multiple agents in
 parallel. Agent definitions live in `.claude/agents/`.
+
+**Parallelism does not change the mandatory execution order.** Phase 0 (SS
+configuration + styled Header/Footer, visually verified) runs **before** any
+writer agents are spawned, and its outputs (`/tmp/ss-css/`, the design tokens
+in `global.css`) are referenced in every writer agent's prompt so they use the
+real compiled CSS instead of guessing. Phase 4 (agent-browser visual QA) runs
+**after** the writer agents complete — the orchestrator performs it (or spawns
+dedicated QA agents) and must not report completion until it passes.
 
 | Agent file | Role | Model |
 |---|---|---|
@@ -1199,8 +1526,10 @@ Menu templates define the rendered HTML for main nav, footer nav, utilities nav,
 and side nav. They reference menu link trees which are server-rendered.
 
 **Storybook mapping:** `Header` and `Footer` components, baked into `PageLayout`.
-No new stories needed. Navigation items in Storybook use static arrays that
-approximate the live menu structure.
+No new stories needed. Navigation items in Storybook are static arrays copied
+**verbatim** from the Drupal main/footer menus (labels, URLs, order, nesting),
+and the components must be styled to match the live rendered header/footer —
+see Phase 0, Step G7. "Approximate" menus are not acceptable.
 
 ---
 
