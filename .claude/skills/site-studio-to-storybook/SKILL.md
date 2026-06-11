@@ -438,11 +438,11 @@ curl -sk $SITE_URL/ | sed -n '/<footer/,/<\/footer>/p' > /tmp/ss-css/footer.html
 mkdir -p /tmp/qa
 agent-browser open $SITE_URL/
 agent-browser wait 2000
-agent-browser screenshot /tmp/qa/live-home.png --full-page
+agent-browser screenshot --full /tmp/qa/live-home.png
 
 agent-browser open "$STORYBOOK_URL/iframe.html?id=<header-story-id>&viewMode=story"
 agent-browser wait 1000
-agent-browser screenshot /tmp/qa/sb-header.png
+agent-browser screenshot --full /tmp/qa/sb-header.png
 ```
 
    Read both screenshots and compare the header and footer regions. Fix every
@@ -509,7 +509,13 @@ The output is grouped by **Tab → Section → Field**. The three tabs are alway
 2. **Layout & Style** — height, alignment, overlay, color selects
 3. **Help** — documentation only, no props
 
-### Step 2 — Extract the help text and use it as the Storybook description
+### Step 2 — Extract the help text and use it as the Storybook description (MANDATORY)
+
+**Hard rule: every component story must include the SS help text verbatim as
+`parameters.docs.description.component`.** A story with a made-up description
+or no description is incomplete — the SS help text is the canonical documentation
+for the component and must appear in Storybook so editors have the same guidance
+in both tools.
 
 The third tab in every SS component form is "Help". Extract it:
 
@@ -534,9 +540,34 @@ echo PHP_EOL;
 " 2>/dev/null
 ```
 
-Use the help text verbatim (lightly reformatted) as
-`parameters.docs.description.component` in the story meta. If there is no help
-text, write a one-sentence description based on the component label.
+Use the help text verbatim (lightly reformatted as markdown) as
+`parameters.docs.description.component` in the story meta. The SS help text is
+HTML — strip tags and convert bullet lists to markdown `- ` items. Bold text
+(`<strong>`) should become `**bold**`. If there is no help text, write a
+one-sentence description based on the component label.
+
+**Format in the story:**
+```tsx
+parameters: {
+  docs: {
+    description: {
+      component: `
+**Section heading**
+- **Field name** — Field description from SS help text.
+- **Another field** — Its description.
+      `.trim(),
+    },
+  },
+},
+```
+
+**Audit command** — find stories that still have invented descriptions (not pulled from SS):
+```bash
+grep -l "description: {" storybook/src/stories/components/*.stories.tsx \
+  | xargs grep -l "component: '" \
+  | xargs grep -lv "Using the\|this component\|**"
+```
+Any file in the output has a one-liner description that was invented, not pulled from SS — update it.
 
 ### Step 3 — Translate every field to a Storybook prop — no exceptions
 
@@ -808,13 +839,18 @@ mkdir -p /tmp/qa
 # Live Drupal page containing the component
 agent-browser open $SITE_URL/<page-using-component>
 agent-browser wait 2000
-agent-browser screenshot /tmp/qa/drupal--<component>.png --full-page
+agent-browser screenshot --full /tmp/qa/drupal--<component>.png
 
 # Storybook story (iframe.html = no Storybook chrome)
 agent-browser open "$STORYBOOK_URL/iframe.html?id=<story-id>&viewMode=story"
 agent-browser wait 1000
-agent-browser screenshot /tmp/qa/sb--<component>.png --full-page
+agent-browser screenshot --full /tmp/qa/sb--<component>.png
 ```
+
+**`agent-browser` screenshot syntax notes:**
+- Full-page capture: `agent-browser screenshot --full /tmp/qa/file.png` (NOT `--full-page`)
+- Scroll: `agent-browser scroll down 2000` (NOT `scroll 0 2000`)
+- The path argument comes AFTER any flags, not before
 
    Story ID derivation: lowercase the title, replace `/` and spaces with `-`,
    append `--default` (e.g. `Components/Hero/Hero` → `components-hero-hero--default`).
@@ -823,8 +859,12 @@ agent-browser screenshot /tmp/qa/sb--<component>.png --full-page
    casing, letter-spacing), colors (text, background, buttons), spacing,
    alignment, image sizing, hover-visible affordances.
 
-4. Fix every discrepancy in the component, re-screenshot, re-compare. Only
-   then emit the report line.
+4. Fix every discrepancy in the component, re-screenshot, re-compare.
+
+5. **Explicitly confirm 100% visual match** before emitting the report line.
+   Write: "✅ 100% visual match confirmed" — do not skip this statement even
+   if the screenshots look close. If there is any remaining discrepancy, the
+   status is `👁 visual QA: FAIL` and the component is not done.
 
 If no live page uses the component, note that in the report line and compare
 against the SS component preview (`$SITE_URL/admin/cohesion/components/components`)
@@ -955,17 +995,24 @@ mkdir -p /tmp/qa
 # Live Drupal page
 agent-browser open $SITE_URL/my-page-path
 agent-browser wait 2000
-agent-browser screenshot /tmp/qa/drupal--my-page.png --full-page
+agent-browser screenshot --full /tmp/qa/drupal--my-page.png
 
 # Storybook story (iframe.html = no Storybook chrome)
 agent-browser open "$STORYBOOK_URL/iframe.html?id=pages-my-page--default&viewMode=story"
 agent-browser wait 1000
-agent-browser screenshot /tmp/qa/sb--my-page.png --full-page
+agent-browser screenshot --full /tmp/qa/sb--my-page.png
 ```
 
 Then **Read both PNG files** and compare top-to-bottom. Fix discrepancies in
 the story (or in the underlying component if the bug is structural),
 re-screenshot, re-compare. Repeat until the two images look identical at a
+glance. **Explicitly write "✅ 100% visual match confirmed" before marking the
+page story done.** A story with an unresolved discrepancy — even a minor one —
+is not done, and must not be reported as done.
+
+**Do not report a match without reading the screenshots.** "It should match"
+or "the props are correct" is not evidence. Only the side-by-side screenshot
+comparison is evidence.
 glance. Record the comparison result per page in the session report.
 
 Common discrepancies to check: background image missing, overlay colour wrong,
