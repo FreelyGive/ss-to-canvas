@@ -989,6 +989,8 @@ full-page screenshot has been compared side-by-side against the live Drupal
 page and every discrepancy fixed. This is a hard gate for every page story,
 no exceptions.
 
+#### Step 1 — take a `--full` screenshot of both sides
+
 ```bash
 mkdir -p /tmp/qa
 
@@ -1003,17 +1005,42 @@ agent-browser wait 1000
 agent-browser screenshot --full /tmp/qa/sb--my-page.png
 ```
 
-Then **Read both PNG files** and compare top-to-bottom. Fix discrepancies in
-the story (or in the underlying component if the bug is structural),
-re-screenshot, re-compare. Repeat until the two images look identical at a
-glance. **Explicitly write "✅ 100% visual match confirmed" before marking the
-page story done.** A story with an unresolved discrepancy — even a minor one —
-is not done, and must not be reported as done.
+#### Step 2 — scroll through BOTH pages in viewport increments
+
+**`--full` screenshots compress long pages into a thumbnail where sections
+collapse visually and are impossible to spot.** After taking the full
+screenshots, scroll through each page in ~800 px increments and take a
+viewport screenshot at each step, until the footer is visible in a
+screenshot. Do this for BOTH the live page and the Storybook story.
+
+```bash
+# Example scroll sequence — repeat for live page AND Storybook story
+agent-browser open $SITE_URL/my-page-path
+agent-browser wait 2000
+agent-browser screenshot /tmp/qa/drupal--my-page--0.png
+agent-browser scroll down 800  && agent-browser wait 300 && agent-browser screenshot /tmp/qa/drupal--my-page--800.png
+agent-browser scroll down 800  && agent-browser wait 300 && agent-browser screenshot /tmp/qa/drupal--my-page--1600.png
+agent-browser scroll down 800  && agent-browser wait 300 && agent-browser screenshot /tmp/qa/drupal--my-page--2400.png
+# … continue until the footer is visible in a screenshot
+```
+
+Read EVERY viewport screenshot for both sides. A section that is invisible
+in the `--full` thumbnail may be clearly visible at a specific scroll position.
+The scroll-through is not optional — it is the only reliable way to catch
+sections that appear near the bottom of long pages.
+
+#### Step 3 — compare and fix
+
+Then **Read all PNG files** and compare top-to-bottom, viewport by viewport.
+Fix discrepancies in the story (or in the underlying component if the bug is
+structural), re-screenshot, re-compare. Repeat until the two pages look
+identical viewport by viewport. **Explicitly write "✅ 100% visual match
+confirmed" before marking the page story done.** A story with an unresolved
+discrepancy — even a minor one — is not done, and must not be reported as done.
 
 **Do not report a match without reading the screenshots.** "It should match"
-or "the props are correct" is not evidence. Only the side-by-side screenshot
-comparison is evidence.
-glance. Record the comparison result per page in the session report.
+or "the props are correct" is not evidence. Only the scroll-through screenshot
+comparison is evidence. Record the comparison result per page in the session report.
 
 Common discrepancies to check: background image missing, overlay colour wrong,
 heading/text colour wrong, layout alignment different, section spacing different,
