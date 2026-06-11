@@ -4,12 +4,14 @@ http:
       entrypoints:
         - http-88
       rule: "Host(`storybook.${DDEV_SITENAME}.${DDEV_TLD}`)"
+      priority: 1000
       service: storybook
       tls: false
     storybook-https:
       entrypoints:
         - http-443
       rule: "Host(`storybook.${DDEV_SITENAME}.${DDEV_TLD}`)"
+      priority: 1000
       service: storybook
       tls: true
 
@@ -18,3 +20,8 @@ http:
       loadbalancer:
         servers:
           - url: http://ddev-${DDEV_SITENAME}-storybook-1:6006
+
+tls:
+  certificates:
+    - certFile: /mnt/ddev-global-cache/traefik/certs/${DDEV_SITENAME}.crt
+      keyFile: /mnt/ddev-global-cache/traefik/certs/${DDEV_SITENAME}.key

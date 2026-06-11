@@ -8,6 +8,7 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=6006
+      - DDEV_HOSTNAME=${DDEV_SITENAME}.${DDEV_TLD}
     restart: unless-stopped
     labels:
       com.ddev.site-name: ${DDEV_SITENAME}

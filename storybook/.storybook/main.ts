@@ -68,7 +68,11 @@ export default {
         },
         hmr: {
           // When proxied through ddev/Traefik, HMR WebSocket must use the
-          // public port (443) and host, not the container's internal port 6006.
+          // public HTTPS host and port, not the container's internal port 6006.
+          host: process.env.DDEV_HOSTNAME
+            ? `storybook.${process.env.DDEV_HOSTNAME}`
+            : undefined,
+          protocol: 'wss',
           clientPort: 443,
         },
       },
