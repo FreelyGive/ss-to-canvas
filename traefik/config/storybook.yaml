@@ -1,0 +1,20 @@
+http:
+  routers:
+    storybook-http:
+      entrypoints:
+        - http-88
+      rule: "Host(`storybook.${DDEV_SITENAME}.${DDEV_TLD}`)"
+      service: storybook
+      tls: false
+    storybook-https:
+      entrypoints:
+        - http-443
+      rule: "Host(`storybook.${DDEV_SITENAME}.${DDEV_TLD}`)"
+      service: storybook
+      tls: true
+
+  services:
+    storybook:
+      loadbalancer:
+        servers:
+          - url: http://ddev-${DDEV_SITENAME}-storybook-1:6006

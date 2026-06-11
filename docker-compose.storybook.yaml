@@ -1,6 +1,22 @@
 services:
-  web:
-    ports:
-      - "6006:6006"
+  storybook:
+    image: node:22-alpine
+    working_dir: /var/www/html/storybook
+    command: sh -c "npm install --prefer-offline && npm run dev"
+    volumes:
+      - ../:/var/www/html:cached
     environment:
-      - STORYBOOK_PORT=6006
+      - HOST=0.0.0.0
+      - PORT=6006
+    restart: unless-stopped
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    networks:
+      - default
+      - ddev_default
+
+networks:
+  ddev_default:
+    external: true
+    name: ddev_default

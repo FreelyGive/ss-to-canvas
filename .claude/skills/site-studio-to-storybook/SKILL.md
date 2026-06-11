@@ -165,6 +165,27 @@ renamed only when rebuilt from SS.
 
 ---
 
+## Pre-flight checks — before building any components, stories, or pages
+
+Before starting any component or page work, verify the Storybook dev server and Drupal site are both accessible:
+
+```bash
+# 1. Confirm the Storybook dev server is running and reachable
+curl -s -o /dev/null -w "%{http_code}" http://localhost:6006
+# Expected: 200
+
+# 2. Confirm the Drupal site is up (DDEV or remote)
+curl -s -o /dev/null -w "%{http_code}" $SITE_URL
+# Expected: 200
+
+# 3. Confirm Drush can reach Drupal
+$DRUSH status --fields=drupal-version 2>/dev/null
+```
+
+If Storybook is not running, start it before writing stories. If Drupal/DDEV is down, start it before extracting any field or page data. Do not proceed with stubs or guesses — always pull real data from a live Drupal instance.
+
+---
+
 ## Current component map
 
 Build this table for your project by running the label-listing Drush command
@@ -637,6 +658,42 @@ launch to last completion. Tokens = sum of `subagent_tokens` across all agents.
 ---
 
 ## Page stories — pixel-faithful reproduction of live Drupal pages
+
+### Which pages to build stories for — always fetch from Drupal, never invent
+
+Always build page stories for **every page linked from the main menu and footer menu first**. These are the highest-traffic, most editor-critical pages and must have stories before any other pages are tackled.
+
+**Always fetch menu links directly from Drupal.** Never invent page titles, URLs, or link labels. The menu structure in Storybook must match the live Drupal site exactly — same labels, same URLs, same order. Copy everything verbatim from the output of this command:
+
+```bash
+$DRUSH ev "
+\$menus = ['main', 'footer'];
+foreach (\$menus as \$menu_name) {
+  echo '=== ' . strtoupper(\$menu_name) . ' MENU ===' . PHP_EOL;
+  \$links = \Drupal::entityTypeManager()->getStorage('menu_link_content')
+    ->loadByProperties(['menu_name' => \$menu_name, 'enabled' => 1]);
+  uasort(\$links, fn(\$a, \$b) => \$a->getWeight() <=> \$b->getWeight());
+  foreach (\$links as \$l) {
+    \$uri = \$l->get('link')->first()->getValue()['uri'] ?? '';
+    if (str_starts_with(\$uri, 'entity:node/')) {
+      \$nid = str_replace('entity:node/', '', \$uri);
+      \$uri = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . \$nid);
+    }
+    \$uri = str_replace('internal:', '', \$uri);
+    \$parent = \$l->getParentId();
+    echo (\$parent ? '  ' : '') . \$l->getTitle() . ' | ' . \$uri . ' | weight=' . \$l->getWeight() . PHP_EOL;
+  }
+  echo PHP_EOL;
+}
+" 2>/dev/null
+```
+
+This gives you the **canonical** list — every link label, URL, and nesting level — sorted by weight. Use this output verbatim when:
+- Building the Header component's nav links
+- Building the Footer component's nav links
+- Deciding which page stories to build first
+
+Resolve each URL to a node ID, then extract canvas data from each node using `ss-node-extractor` before writing the story. Do not use placeholder content for menu pages.
 
 **Page stories must be exact reproductions of the live Drupal page.** Use the
 same text, headings, images, layouts, colors, and component order as configured

@@ -1,7 +1,7 @@
 name: ss-to-storybook
 project_files:
   - docker-compose.storybook.yaml
-  - supervisord.conf.d/storybook.conf
+  - traefik/config/storybook.yaml
   - storybook
   - .claude/agents/ss-component-writer.md
   - .claude/agents/ss-node-extractor.md
@@ -33,7 +33,7 @@ post_install_actions:
   - "echo 'SS to Storybook addon installed.'"
   - "echo 'Next steps:'"
   - "echo '  1. ddev restart'"
-  - "echo '  2. Storybook will auto-start at https://${DDEV_HOSTNAME}:6006'"
+  - "echo '  2. Storybook will be available at https://storybook.${DDEV_HOSTNAME}'"
 removal_actions:
   - "rm -f ${DDEV_APPROOT}/.ddev/docker-compose.storybook.yaml"
-  - "rm -f ${DDEV_APPROOT}/.ddev/supervisord.conf.d/storybook.conf"
+  - "rm -f ${DDEV_APPROOT}/.ddev/traefik/config/storybook.yaml"
